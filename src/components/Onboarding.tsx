@@ -108,6 +108,133 @@ const AsciiMotionBulb = () => {
   );
 };
 
+const AsciiMotionProcess = () => {
+  const [frame, setFrame] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setFrame((f) => f + 1);
+    }, 100);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const chars = [" ", "·", "K", "■"];
+  
+  let ascii = "";
+  for (let y = 0; y < 19; y++) {
+    let row = "";
+    for (let x = 0; x < 38; x++) {
+      let inShape = false;
+      const mx = 19;
+      const dx = Math.abs(x - mx);
+      
+      const isMic = Math.floor(frame / 40) % 2 === 0;
+
+      if (isMic) {
+        // Microphone Capsule
+        if (y >= 2 && y <= 8 && dx <= 3) {
+          if (y === 2 && dx <= 1) inShape = true;
+          else if (y === 8 && dx <= 1) inShape = true;
+          else if (y >= 3 && y <= 7) inShape = true;
+        }
+        
+        // U-Bracket
+        if (y >= 5 && y <= 9 && dx === 5) inShape = true;
+        if (y === 10 && dx >= 1 && dx <= 5) inShape = true;
+        
+        // Stand
+        if (y >= 11 && y <= 15 && dx <= 1) inShape = true;
+        
+        // Base
+        if (y === 16 && dx <= 4) inShape = true;
+        if (y === 17 && dx <= 6) inShape = true;
+      } else {
+        // Slanted Pencil with writing motion
+        const wiggle = Math.sin(frame * 0.4) * 2; // moves left and right
+        const px1 = 26 + wiggle;
+        const py1 = 2;
+        const px2 = 16 + wiggle;
+        const py2 = 12;
+        
+        const ABx = px2 - px1;
+        const ABy = py2 - py1;
+        const APx = x - px1;
+        const APy = y - py1;
+        const len2 = ABx*ABx + ABy*ABy;
+        let t = (APx*ABx + APy*ABy) / len2;
+        
+        t = Math.max(-0.1, Math.min(1.2, t));
+        const cx = px1 + t * ABx;
+        const cy = py1 + t * ABy;
+        const distToLine = Math.sqrt((x-cx)*(x-cx)*0.6 + (y-cy)*(y-cy)); // 0.6 aspect ratio correction for diagonal
+        
+        if (t < 0) {
+          // Eraser
+          if (distToLine < 2.5) inShape = true;
+        } else if (t >= 0 && t <= 1) {
+          // Body
+          if (distToLine < 2.5) inShape = true;
+        } else if (t > 1 && t <= 1.2) {
+          // Tip cone
+          const tipProgress = (t - 1) / 0.2; 
+          const tipWidth = 2.5 * (1 - tipProgress);
+          if (distToLine <= tipWidth) inShape = true;
+        }
+      }
+      
+      const time = frame * 0.15;
+      const n1 = Math.sin((x - mx) * 0.4 + time);
+      const n2 = Math.cos(y * 0.5 - time);
+      const n3 = Math.sin((x + y) * 0.3 + time * 1.2);
+      let noise = (n1 + n2 + n3) / 3; 
+
+      let intensity = 0;
+
+      if (inShape) {
+        intensity = 0.5 + noise * 0.5; 
+        if (isMic && y >= 3 && y <= 7 && dx === 3) intensity += 0.2; // edge glow for capsule
+      } else {
+        intensity = 0; 
+        
+        // Constant ambient waves from the center (19, 9) so the overall ASCII shape never changes
+        const dist = Math.sqrt((x-19)*(x-19)*0.4 + (y-9)*(y-9));
+        const wave = Math.sin(dist * 0.8 - time * 1.5);
+        if (wave > 0.85 && dist > 5 && dist < 14) {
+          intensity = 0.3; // faint ambient dots
+        }
+      }
+
+      let charIdx = 0;
+      if (intensity > 0.8) charIdx = 3;
+      else if (intensity > 0.5) charIdx = 2;
+      else if (intensity > 0.2) charIdx = 1;
+      else charIdx = 0;
+      
+      row += chars[charIdx];
+    }
+    ascii += row + "\n";
+  }
+
+  return (
+    <pre 
+      className="slide-in" 
+      style={{ 
+        animationDelay: '0.2s', 
+        lineHeight: '10px', 
+        fontFamily: 'monospace', 
+        fontSize: '10px', 
+        color: '#FFF', 
+        textShadow: '0 0 5px rgba(255,255,255,0.2)',
+        opacity: 0.7,
+        letterSpacing: '0.1em',
+        margin: 0
+      }}
+    >
+      {ascii}
+    </pre>
+  );
+};
+
 const STEPS = [
   {
     id: "welcome",
@@ -256,6 +383,12 @@ export default function Onboarding() {
             {currentStep.id === "welcome" && (
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 pointer-events-none z-0 overflow-visible">
                 <AsciiMotionBulb />
+              </div>
+            )}
+
+            {currentStep.id === "process" && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 pointer-events-none z-0 overflow-visible">
+                <AsciiMotionProcess />
               </div>
             )}
           </div>

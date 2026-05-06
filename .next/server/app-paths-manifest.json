@@ -1,6 +1,7 @@
 {
-  "/capture/page": "app/capture/page.js",
   "/settings/page": "app/settings/page.js",
+  "/capture/page": "app/capture/page.js",
   "/onboarding/page": "app/onboarding/page.js",
+  "/api/route": "app/api/route.js",
   "/page": "app/page.js"
 }
