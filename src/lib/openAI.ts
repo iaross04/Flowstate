@@ -21,7 +21,7 @@ export async function processWithObsidianLibrarian(
     const prompt = generateLibrarianPrompt(userMessage);
 
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent`,
       {
         contents: [
           {
@@ -60,7 +60,12 @@ export async function processWithObsidianLibrarian(
 
     return result;
   } catch (error) {
-    console.error("Error processing with Obsidian Librarian:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      const geminiError = error.response.data?.error;
+      throw new Error(
+        `Gemini ${error.response.status}: ${geminiError?.message ?? error.response.statusText} (status: ${geminiError?.status ?? "unknown"})`
+      );
+    }
     throw error;
   }
 }

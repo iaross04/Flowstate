@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch *)",
+      "Bash(Get-Content src\\\\app\\\\api\\\\route.ts)",
+      "Bash(npm list *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(git remote *)"
+    ]
+  }
+}

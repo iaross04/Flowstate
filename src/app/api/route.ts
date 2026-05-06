@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processWithObsidianLibrarian } from "../../lib/openAI";
+import { pushNote, parseRepo } from "../../lib/github";
 
-/**
- * POST /api
- * 
- * Processes a user message through the Obsidian Librarian AI
- * and returns categorized, structured JSON for vault organization.
- * 
- * Using: Google Gemini API (gemini-flash-latest)
- */
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, githubToken, repoName } = await request.json();
 
     if (!message || typeof message !== "string") {
       return NextResponse.json(
@@ -22,13 +15,24 @@ export async function POST(request: NextRequest) {
 
     const result = await processWithObsidianLibrarian(message);
 
-    return NextResponse.json(result);
+    let githubUrl: string | undefined;
+    if (githubToken && repoName) {
+      const { owner, repo } = parseRepo(repoName);
+      const filePath = `notes/${result.path}`;
+      githubUrl = await pushNote({
+        token: githubToken,
+        owner,
+        repo,
+        path: filePath,
+        content: result.content,
+      });
+    }
+
+    return NextResponse.json({ ...result, githubUrl });
   } catch (error) {
     console.error("API Error:", error);
     const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to process message";
+      error instanceof Error ? error.message : "Failed to process message";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
