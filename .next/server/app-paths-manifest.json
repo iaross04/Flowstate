@@ -1,5 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/settings/page": "app/settings/page.js"
+  "/capture/page": "app/capture/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/onboarding/page": "app/onboarding/page.js",
+  "/page": "app/page.js"
 }

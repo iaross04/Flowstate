@@ -133,7 +133,7 @@ export default function LandingPage() {
           {/* Buttons */}
           <div className="w-full flex flex-col items-center gap-3">
             <button
-              onClick={() => router.push("/settings")}
+              onClick={() => router.push("/onboarding")}
               className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
             >
               Get Started
