@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Flowstate",
-  description: "Smart note capture and organization",
+  title: "FlowState",
+  description: "Capture and sort ideas instantly.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-neutral-950 text-white antialiased">
+        {children}
+      </body>
     </html>
   );
 }
