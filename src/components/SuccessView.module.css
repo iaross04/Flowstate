@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.successCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  max-width: 360px;
+}
+
+.icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 12px 0;
+}
+
+.summary {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.pathBadge {
+  display: inline-block;
+  background: #f5f5f7;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #8e8e93;
+  margin-bottom: 24px;
+  font-family: "SF Mono", Monaco, monospace;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.button {
+  padding: 12px 28px;
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.button:hover {
+  background: #0a66d2;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
