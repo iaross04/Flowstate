@@ -12,44 +12,39 @@ export async function processWithObsidianLibrarian(
   userMessage: string
 ): Promise<LibrarianResponse> {
   try {
-    // Try to get API key from environment variables (Vercel/production)
-    // Falls back to hardcoded key for PWA/local testing
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || 
-                   process.env.GEMINI_API_KEY ||
-                   "AIzaSyDs5gbVIOz8QCv3ss0wLckAoyFHA0i4xw0";
+    const apiKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY;
 
     if (!apiKey) {
-      throw new Error("Gemini API key not configured");
+      throw new Error("Grok (xAI) API key not configured");
     }
 
     const prompt = generateLibrarianPrompt(userMessage);
 
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent`,
+      `https://api.x.ai/v1/chat/completions`,
       {
-        contents: [
+        model: "grok-4.3", // using the recommended model
+        messages: [
           {
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
+            role: "system",
+            content: "You are a specialized AI assistant designed to sort notes for an Obsidian vault. Output your response strictly as JSON.",
+          },
+          {
+            role: "user",
+            content: prompt,
           },
         ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1000,
-        },
+        temperature: 0.7,
       },
       {
         headers: {
           "Content-Type": "application/json",
-          "X-goog-api-key": apiKey,
+          "Authorization": `Bearer ${apiKey}`,
         },
       }
     );
 
-    const content = response.data.candidates[0].content.parts[0].text.trim();
+    const content = response.data.choices[0].message.content.trim();
 
     // Parse the JSON response
     const jsonStart = content.indexOf("{");
@@ -65,9 +60,9 @@ export async function processWithObsidianLibrarian(
     return result;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      const geminiError = error.response.data?.error;
+      const xaiError = error.response.data?.error;
       throw new Error(
-        `Gemini ${error.response.status}: ${geminiError?.message ?? error.response.statusText} (status: ${geminiError?.status ?? "unknown"})`
+        `Grok API ${error.response.status}: ${xaiError?.message ?? error.response.statusText}`
       );
     }
     throw error;

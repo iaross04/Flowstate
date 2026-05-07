@@ -16,7 +16,7 @@ import * as path from "path";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
-import { processWithObsidianLibrarian } from "../src/lib/openAI";
+import { processWithObsidianLibrarian } from "../src/lib/librarianAI";
 import { pushNote, parseRepo } from "../src/lib/github";
 
 const TEST_MESSAGE =

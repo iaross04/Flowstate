@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { processWithObsidianLibrarian } from "../../lib/openAI";
+import { processWithObsidianLibrarian } from "../../lib/librarianAI";
 import { parseRepo, pushNote } from "../../lib/github";
 
 export async function POST(request: Request) {
