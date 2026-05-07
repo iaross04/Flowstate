@@ -211,7 +211,7 @@ export default function SettingsPage() {
             }
         `}</style>
 
-            <main className="fs-root w-full h-screen bg-[#FFFFFF] flex flex-col overflow-hidden">
+            <main className="fs-root w-full min-h-screen bg-[#FFFFFF] flex flex-col overflow-hidden px-4 sm:px-6 lg:px-8">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
                         <p className="text-sm text-gray-500">loading...</p>
@@ -219,22 +219,22 @@ export default function SettingsPage() {
                 ) : mode === "manage" ? (
                     <>
                         {/* Top nav */}
-                        <div className="flex items-center justify-between px-8 pt-12">
+                        <div className="flex items-center justify-between px-2 sm:px-4 pt-8 sm:pt-12">
                             <button
                                 onClick={() => router.back()}
                                 className="back-btn text-xs text-[#777] font-medium tracking-wide"
                             >
                                 ← back
                             </button>
-                            <p className="text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
+                            <p className="text-[8px] sm:text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
                                 FlowState
                             </p>
                             <div style={{ width: 40 }} />
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 flex flex-col justify-center px-8 pb-4 overflow-y-auto">
-                            <p className="text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-3">
+                        <div className="flex-1 flex flex-col justify-center px-2 sm:px-4 pb-4 sm:pb-8 overflow-y-auto">
+                            <p className="text-[8px] sm:text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-2 sm:mb-3">
                                 repositories
                             </p>
 
@@ -245,9 +245,7 @@ export default function SettingsPage() {
                             ) : (
                                 <div className="space-y-3 mb-6">
                                     {repos.map((repo) => (
-                                        <div
-                                            key={repo.id}
-                                            className="p-4 border border-[#E0E0E0] rounded-lg cursor-pointer transition-all"
+                                        <div className="p-3 sm:p-4 border border-[#E0E0E0] rounded-lg cursor-pointer transition-all"
                                             style={{
                                                 backgroundColor: activeRepoId === repo.id ? "#F5F5F5" : "#FFFFFF",
                                                 borderColor: activeRepoId === repo.id ? "#111" : "#E0E0E0",
@@ -256,13 +254,13 @@ export default function SettingsPage() {
                                         >
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
-                                                    <p className="text-[14px] font-semibold text-[#111]">{repo.repoName}</p>
-                                                    <p className="text-[11px] text-[#666] mt-1">
+                                                    <p className="text-[12px] sm:text-[14px] font-semibold text-[#111]">{repo.repoName}</p>
+                                                    <p className="text-[9px] sm:text-[11px] text-[#666] mt-1">
                                                         Added {new Date(repo.addedAt).toLocaleDateString()}
                                                     </p>
                                                 </div>
                                                 {activeRepoId === repo.id && (
-                                                    <span className="text-[12px] font-semibold text-[#007AFF] ml-2">active</span>
+                                                    <span className="text-[10px] sm:text-[12px] font-semibold text-[#007AFF] ml-2">active</span>
                                                 )}
                                             </div>
                                             <button
@@ -270,7 +268,7 @@ export default function SettingsPage() {
                                                     e.stopPropagation();
                                                     handleDeleteRepo(repo.id);
                                                 }}
-                                                className="mt-3 text-[11px] text-red-500 hover:text-red-700 transition-colors"
+                                                className="mt-2 sm:mt-3 text-[9px] sm:text-[11px] text-red-500 hover:text-red-700 transition-colors"
                                             >
                                                 delete
                                             </button>
@@ -281,9 +279,9 @@ export default function SettingsPage() {
                         </div>
 
                         {/* CTA */}
-                        <div className="px-8 pb-12">
+                        <div className="px-2 sm:px-4 pb-8 sm:pb-12">
                             <button
-                                className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
+                                className="btn-primary w-full py-3 sm:py-3.5 bg-[#111] text-white rounded-2xl text-sm sm:text-base font-semibold tracking-wide"
                                 onClick={() => {
                                     setMode("add");
                                     setStep(0);
@@ -292,7 +290,7 @@ export default function SettingsPage() {
                                 + add repository
                             </button>
                             <button
-                                className="btn-primary w-full py-3.5 mt-2 bg-[#007AFF] text-white rounded-2xl text-sm font-semibold tracking-wide"
+                                className="btn-primary w-full py-3 sm:py-3.5 mt-2 bg-[#007AFF] text-white rounded-2xl text-sm sm:text-base font-semibold tracking-wide"
                                 onClick={() => {
                                     if (activeRepoId) router.push("/capture");
                                 }}
@@ -305,36 +303,36 @@ export default function SettingsPage() {
                 ) : (
                     <>
                         {/* Top nav */}
-                        <div className="flex items-center justify-between px-8 pt-12">
+                        <div className="flex items-center justify-between px-2 sm:px-4 pt-8 sm:pt-12">
                             <button
                                 onClick={handleBackFromAdd}
                                 className="back-btn text-xs text-[#777] font-medium tracking-wide"
                             >
                                 ← back
                             </button>
-                            <p className="text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
+                            <p className="text-[8px] sm:text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
                                 FlowState
                             </p>
                             <div style={{ width: 40 }} />
                         </div>
 
                         {/* Progress dots */}
-                        <div className="flex items-center justify-center gap-2 mt-6">
+                        <div className="flex items-center justify-center gap-2 mt-4 sm:mt-6">
                             {dots}
                         </div>
 
                         {/* Content — vertically centered */}
-                        <div className="flex-1 flex flex-col justify-center px-8 pb-4">
+                        <div className="flex-1 flex flex-col justify-center px-2 sm:px-4 pb-4 sm:pb-8">
 
                             {/* Step label */}
-                            <p key={`label-${step}`} className="slide-in text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-3">
+                            <p key={`label-${step}`} className="slide-in text-[8px] sm:text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-2 sm:mb-3">
                                 {current.label}
                             </p>
 
                             {/* Question */}
                             <h1
                                 key={`q-${step}`}
-                                className="slide-in text-[28px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-8 whitespace-pre-line"
+                                className="slide-in text-[24px] sm:text-[28px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-6 sm:mb-8 whitespace-pre-line"
                             >
                                 {current.question.split("\n")[0]}
                                 <br />
@@ -360,7 +358,7 @@ export default function SettingsPage() {
                             </div>
 
                             {/* Hint */}
-                            <p key={`hint-${step}`} className="slide-in text-[11px] text-[#333] mb-1">
+                            <p key={`hint-${step}`} className="slide-in text-[10px] sm:text-[11px] text-[#333] mb-1">
                                 {current.hint}
                                 {current.link && (
                                     <>
@@ -384,9 +382,9 @@ export default function SettingsPage() {
                         </div>
 
                         {/* CTA */}
-                        <div className="px-8 pb-12">
+                        <div className="px-2 sm:px-4 pb-8 sm:pb-12">
                             <button
-                                className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
+                                className="btn-primary w-full py-3 sm:py-3.5 bg-[#111] text-white rounded-2xl text-sm sm:text-base font-semibold tracking-wide"
                                 onClick={handleNext}
                                 disabled={!value.trim() || saving}
                             >

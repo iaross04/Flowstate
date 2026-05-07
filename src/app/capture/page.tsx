@@ -225,7 +225,9 @@ export default function CapturePage() {
           outline: none;
           resize: none;
           font-family: 'Space Grotesk', sans-serif;
-          font-size: 20px;
+          font-size: 16px;
+          sm:font-size: 18px;
+          lg:font-size: 20px;
           font-weight: 500;
           color: #111;
           line-height: 1.5;
@@ -243,8 +245,10 @@ export default function CapturePage() {
           align-items: center;
           background: #F5F5F5;
           border-radius: 999px;
-          padding: 4px;
-          gap: 2px;
+          padding: 3px;
+          sm:padding: 4px;
+          gap: 1px;
+          sm:gap: 2px;
         }
         .mode-btn {
           padding: 6px 16px;
@@ -271,8 +275,10 @@ export default function CapturePage() {
         .submit-btn:disabled { opacity: 0.2; cursor: not-allowed; }
 
         .mic-ring {
-          width: 88px;
-          height: 88px;
+          width: 72px;
+          sm:width: 88px;
+          height: 72px;
+          sm:height: 88px;
           border-radius: 50%;
           background: #111;
           display: flex;
@@ -332,16 +338,16 @@ export default function CapturePage() {
         .now-btn:hover { color: #555; }
       `}</style>
 
-      <main className="fs-root w-full h-screen bg-[#FFFFFF] flex flex-col overflow-hidden">
+      <main className="fs-root w-full min-h-screen bg-[#FFFFFF] flex flex-col overflow-hidden px-4 sm:px-6 lg:px-8">
 
         {/* Top bar */}
-        <div className="flex items-center justify-between px-8 pt-12">
-          <p className="text-[9px] font-semibold tracking-[.28em] text-[#111] uppercase">
+        <div className="flex items-center justify-between pt-8 sm:pt-12 px-2 sm:px-4">
+          <p className="text-[8px] sm:text-[9px] font-semibold tracking-[.28em] text-[#111] uppercase">
             FlowState
           </p>
           <button
             onClick={() => router.push("/settings")}
-            className="text-[11px] text-[#666] font-medium tracking-wide hover:text-[#444] transition-colors"
+            className="text-[10px] sm:text-[11px] text-[#666] font-medium tracking-wide hover:text-[#444] transition-colors"
           >
             settings
           </button>
@@ -373,7 +379,7 @@ export default function CapturePage() {
           {!done && !thinking && mode === "text" && (
             <div className="fade-in flex flex-col gap-6">
               {/* Prompt */}
-              <p className="text-[10px] font-semibold tracking-[.2em] text-[#111] uppercase">
+              <p className="text-[8px] sm:text-[10px] font-semibold tracking-[.2em] text-[#111] uppercase">
                 what's on your mind?
               </p>
 
