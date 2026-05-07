@@ -83,7 +83,7 @@ export default function LandingPage() {
         .btn-skip {
           transition: color 0.15s ease;
         }
-        .btn-skip:hover { color: #999; }
+        .btn-skip:hover { color: #444; }
         
         .splash-screen {
           position: fixed;
@@ -129,7 +129,7 @@ export default function LandingPage() {
         <div className="flex justify-center pt-12">
           <div className="flex items-center gap-2 bg-[#F9F9F9] border border-[#EBEBEB] rounded-full px-4 py-1.5 shadow-sm">
             <span className="blink block w-1.5 h-1.5 rounded-full bg-[#111]" />
-            <span className="text-[10px] font-semibold text-[#888] uppercase tracking-[.2em]">
+            <span className="text-[10px] font-semibold text-[#333] uppercase tracking-[.2em]">
               AI-powered notes
             </span>
           </div>
@@ -148,7 +148,7 @@ export default function LandingPage() {
         <div className="px-8 pb-12 flex flex-col items-center gap-6">
           {/* Text block */}
           <div className="flex flex-col items-center gap-1 text-center">
-            <p className="text-[9px] font-semibold tracking-[.28em] text-[#888] uppercase mb-1">
+            <p className="text-[9px] font-semibold tracking-[.28em] text-[#333] uppercase mb-1">
               FlowState
             </p>
             <h1 className="text-[26px] font-bold text-[#111] leading-snug tracking-[-0.02em]">
@@ -166,12 +166,6 @@ export default function LandingPage() {
               className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
             >
               Get Started
-            </button>
-            <button
-              onClick={() => router.push("/capture")}
-              className="btn-skip text-xs text-[#888] font-medium tracking-wide"
-            >
-              already set up? skip
             </button>
           </div>
         </div>

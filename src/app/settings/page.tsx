@@ -85,7 +85,7 @@ export default function SettingsPage() {
                 width: i === step ? "20px" : "6px",
                 height: "6px",
                 borderRadius: "999px",
-                background: i === step ? "#111" : "#AAA",
+                background: i === step ? "#111" : "#555",
                 transition: "all 0.3s ease",
             }}
         />
@@ -114,7 +114,7 @@ export default function SettingsPage() {
             caret-color: #111;
             }
             .fs-input:focus { border-bottom-color: #111; }
-            .fs-input::placeholder { color: #888; font-weight: 400; }
+            .fs-input::placeholder { color: #333; font-weight: 400; }
 
             .btn-primary {
             transition: opacity 0.15s ease, transform 0.1s ease;
@@ -130,15 +130,15 @@ export default function SettingsPage() {
             background: none;
             border: none;
             cursor: pointer;
-            color: #888;
+            color: #333;
             font-size: 14px;
             padding: 4px;
             transition: color 0.15s;
             }
-            .eye-toggle:hover { color: #888; }
+            .eye-toggle:hover { color: #333; }
 
             .back-btn { transition: color 0.15s ease; }
-            .back-btn:hover { color: #999; }
+            .back-btn:hover { color: #444; }
 
             .slide-in {
             animation: slideIn 0.25s ease forwards;
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Hint */}
-                    <p key={`hint-${step}`} className="slide-in text-[11px] text-[#888] mb-1">
+                    <p key={`hint-${step}`} className="slide-in text-[11px] text-[#333] mb-1">
                         {current.hint}
                         {current.link && (
                             <>

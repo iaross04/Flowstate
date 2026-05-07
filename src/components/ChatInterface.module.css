@@ -27,7 +27,7 @@
 
 .subtitle {
   font-size: 13px;
-  color: #8e8e93;
+  color: #555555;
   margin: 4px 0 0 0;
 }
 
@@ -76,7 +76,7 @@
 
 .emptyText {
   font-size: 15px;
-  color: #8e8e93;
+  color: #555555;
   margin: 0;
   max-width: 200px;
 }
@@ -99,7 +99,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #8e8e93;
+  background: #555555;
   animation: bounce 1.4s infinite;
 }
 
@@ -156,7 +156,7 @@
 }
 
 .input::placeholder {
-  color: #8e8e93;
+  color: #555555;
 }
 
 .input:disabled {

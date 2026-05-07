@@ -221,7 +221,7 @@ export default function CapturePage() {
           overflow: hidden;
         }
         .fs-textarea::placeholder {
-          color: #DDD;
+          color: #333;
           font-weight: 400;
         }
 
@@ -241,7 +241,7 @@ export default function CapturePage() {
           font-family: 'Space Grotesk', sans-serif;
           font-size: 12px;
           font-weight: 600;
-          color: #AAA;
+          color: #555;
           cursor: pointer;
           transition: all 0.2s ease;
           letter-spacing: 0.03em;
@@ -305,7 +305,7 @@ export default function CapturePage() {
         .tag-pill {
           display: inline-block;
           background: #F5F5F5;
-          color: #888;
+          color: #333;
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.05em;
@@ -323,12 +323,12 @@ export default function CapturePage() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between px-8 pt-12">
-          <p className="text-[9px] font-semibold tracking-[.28em] text-[#CCC] uppercase">
+          <p className="text-[9px] font-semibold tracking-[.28em] text-[#111] uppercase">
             FlowState
           </p>
           <button
             onClick={() => router.push("/settings")}
-            className="text-[11px] text-[#CCC] font-medium tracking-wide hover:text-[#999] transition-colors"
+            className="text-[11px] text-[#666] font-medium tracking-wide hover:text-[#444] transition-colors"
           >
             settings
           </button>
@@ -360,7 +360,7 @@ export default function CapturePage() {
           {!done && !thinking && mode === "text" && (
             <div className="fade-in flex flex-col gap-6">
               {/* Prompt */}
-              <p className="text-[10px] font-semibold tracking-[.2em] text-[#CCC] uppercase">
+              <p className="text-[10px] font-semibold tracking-[.2em] text-[#111] uppercase">
                 what's on your mind?
               </p>
 
@@ -394,7 +394,7 @@ export default function CapturePage() {
                 {recording && (
                   <div className="flex items-center gap-1.5">
                     <span className="blink block w-1.5 h-1.5 rounded-full bg-[#111]" />
-                    <span className="text-[11px] text-[#999] font-medium">recording</span>
+                    <span className="text-[11px] text-[#444] font-medium">recording</span>
                   </div>
                 )}
               </div>
@@ -435,7 +435,7 @@ export default function CapturePage() {
           {thinking && (
             <div className="fade-in flex flex-col items-center justify-center gap-4">
               <span className="blink block w-3 h-3 rounded-full bg-[#111]" />
-              <p className="text-xs text-[#999] font-medium tracking-wide">
+              <p className="text-xs text-[#444] font-medium tracking-wide">
                 sorting your thoughts...
               </p>
             </div>
@@ -480,7 +480,7 @@ export default function CapturePage() {
                 </div>
 
                 {/* Preview text */}
-                <p className="text-[12px] text-[#999] leading-relaxed line-clamp-3">
+                <p className="text-[12px] text-[#444] leading-relaxed line-clamp-3">
                   {resultData.summary || resultData.content}
                 </p>
 

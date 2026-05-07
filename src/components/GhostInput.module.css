@@ -27,12 +27,12 @@
 
 .input:disabled {
   background: #f5f5f7;
-  color: #8e8e93;
+  color: #555555;
   cursor: not-allowed;
 }
 
 .input::placeholder {
-  color: #8e8e93;
+  color: #555555;
 }
 
 .suggestions {

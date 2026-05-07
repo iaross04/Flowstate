@@ -70,7 +70,7 @@ import { useEffect, useState } from "react";
             .tag-pill {
             display: inline-block;
             background: #F5F5F5;
-            color: #888;
+            color: #333;
             font-size: 10px;
             font-weight: 600;
             letter-spacing: 0.05em;
@@ -161,7 +161,7 @@ import { useEffect, useState } from "react";
                 </div>
 
                 {/* Preview text */}
-                <p className="text-[12px] text-[#999] leading-relaxed">
+                <p className="text-[12px] text-[#444] leading-relaxed">
                     {note.preview}
                 </p>
 
