@@ -12,7 +12,11 @@ export async function processWithObsidianLibrarian(
   userMessage: string
 ): Promise<LibrarianResponse> {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    // Try to get API key from environment variables (Vercel/production)
+    // Falls back to hardcoded key for PWA/local testing
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || 
+                   process.env.GEMINI_API_KEY ||
+                   "AIzaSyDs5gbVIOz8QCv3ss0wLckAoyFHA0i4xw0";
 
     if (!apiKey) {
       throw new Error("Gemini API key not configured");
