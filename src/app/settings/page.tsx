@@ -85,7 +85,7 @@ export default function SettingsPage() {
                 width: i === step ? "20px" : "6px",
                 height: "6px",
                 borderRadius: "999px",
-                background: i === step ? "#111" : "#DDD",
+                background: i === step ? "#111" : "#AAA",
                 transition: "all 0.3s ease",
             }}
         />
@@ -101,7 +101,7 @@ export default function SettingsPage() {
             width: 100%;
             background: transparent;
             border: none;
-            border-bottom: 1.5px solid #EBEBEB;
+            border-bottom: 1.5px solid #CCC;
             border-radius: 0;
             padding: 12px 36px 12px 0;
             font-size: 16px;
@@ -114,7 +114,7 @@ export default function SettingsPage() {
             caret-color: #111;
             }
             .fs-input:focus { border-bottom-color: #111; }
-            .fs-input::placeholder { color: #CCC; font-weight: 400; }
+            .fs-input::placeholder { color: #888; font-weight: 400; }
 
             .btn-primary {
             transition: opacity 0.15s ease, transform 0.1s ease;
@@ -130,7 +130,7 @@ export default function SettingsPage() {
             background: none;
             border: none;
             cursor: pointer;
-            color: #CCC;
+            color: #888;
             font-size: 14px;
             padding: 4px;
             transition: color 0.15s;
@@ -155,11 +155,11 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between px-8 pt-12">
                     <button
                         onClick={() => step === 0 ? router.back() : setStep((s) => s - 1)}
-                        className="back-btn text-xs text-[#BBB] font-medium tracking-wide"
+                        className="back-btn text-xs text-[#777] font-medium tracking-wide"
                     >
                         ← back
                     </button>
-                    <p className="text-[9px] font-semibold tracking-[.28em] text-[#BBB] uppercase">
+                    <p className="text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
                         FlowState
                     </p>
                     <div style={{ width: 40 }} />
@@ -174,7 +174,7 @@ export default function SettingsPage() {
                 <div className="flex-1 flex flex-col justify-center px-8 pb-4">
 
                     {/* Step label */}
-                    <p key={`label-${step}`} className="slide-in text-[10px] font-semibold tracking-[.2em] text-[#BBB] uppercase mb-3">
+                    <p key={`label-${step}`} className="slide-in text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-3">
                         {current.label}
                     </p>
 
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                     >
                         {current.question.split("\n")[0]}
                         <br />
-                        <span className="text-[#BBB]">{current.question.split("\n")[1]}</span>
+                        <span className="text-[#777]">{current.question.split("\n")[1]}</span>
                     </h1>
 
                     {/* Input */}
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Hint */}
-                    <p key={`hint-${step}`} className="slide-in text-[11px] text-[#CCC] mb-1">
+                    <p key={`hint-${step}`} className="slide-in text-[11px] text-[#888] mb-1">
                         {current.hint}
                         {current.link && (
                             <>
@@ -216,7 +216,7 @@ export default function SettingsPage() {
                                     href={current.link.url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="text-[#AAA] underline"
+                                    className="text-[#666] underline"
                                 >
                                     {current.link.text}
                                 </a>
