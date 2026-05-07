@@ -2,35 +2,70 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+const validateToken = async (token: string, repo: string): Promise<boolean> => {
+  try {
+    const [owner, name] = repo.split('/');
+    if (!owner || !name) return false;
+    const res = await fetch(`https://api.github.com/repos/${owner}/${name}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+};
+
 export default function LandingPage() {
   const router = useRouter();
   const [showSplash, setShowSplash] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
     
-    if (hasSeenSplash) {
-      setShowSplash(false);
+    // Check for stored credentials
+    const token = localStorage.getItem("fs_github_token");
+    const repo = localStorage.getItem("fs_repo_name");
+    
+    if (token && repo) {
+      // Validate the stored token
+      setChecking(true);
+      validateToken(token, repo).then((isValid) => {
+        if (isValid) {
+          // Token is valid, go directly to capture
+          router.push("/capture");
+          return;
+        }
+        // Token is invalid, show landing page
+        setChecking(false);
+        setShowSplash(true);
+        const fadeTimer = setTimeout(() => setFadeOut(true), 1000);
+        const removeTimer = setTimeout(() => {
+          setShowSplash(false);
+        }, 1500);
+        return () => {
+          clearTimeout(fadeTimer);
+          clearTimeout(removeTimer);
+        };
+      });
     } else {
-      // Show splash normally
+      // No credentials, show landing page
       setShowSplash(true);
       const fadeTimer = setTimeout(() => setFadeOut(true), 1000);
       const removeTimer = setTimeout(() => {
         setShowSplash(false);
-        sessionStorage.setItem("hasSeenSplash", "true");
       }, 1500);
       return () => {
         clearTimeout(fadeTimer);
         clearTimeout(removeTimer);
       };
     }
-  }, []);
+  }, [router]);
 
-  // Avoid flashes during initial server load
-  if (!isClient) {
+  // Avoid flashes during initial server load or while checking token
+  if (!isClient || checking) {
     return <div className="w-full h-screen bg-[#FFFFFF]" />;
   }
 
