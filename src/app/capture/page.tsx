@@ -94,6 +94,14 @@ export default function CapturePage() {
     }
   }, [mode, done, thinking]);
 
+  useEffect(() => {
+    return () => {
+      if (mode !== "mic" && recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [mode]);
+
   const handleSubmit = async () => {
     if (!text.trim()) return;
     setThinking(true);
@@ -405,13 +413,13 @@ export default function CapturePage() {
               </button>
 
               {/* Transcript display */}
-              {text && (
+              {text !== null && (
                 <div className="w-full max-w-md">
                   <textarea
                     ref={textareaRef}
                     className="fs-textarea"
                     value={text}
-                    readOnly
+                    onChange={(e) => setText(e.target.value)}
                     placeholder="your words will appear here..."
                   />
                 </div>
