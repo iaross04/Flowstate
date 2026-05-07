@@ -262,9 +262,29 @@ export default function Onboarding() {
   useEffect(() => {
     setIsClient(true);
     // Auto-fill existing keys if any (useful for testing or partial setups)
+    // Try to get from new format first, fall back to old format
+    const reposJson = localStorage.getItem("fs_repos");
+    const activeRepoId = localStorage.getItem("fs_active_repo_id");
+    
+    let token = "";
+    let repo = "";
+    
+    if (reposJson && activeRepoId) {
+      const repos = JSON.parse(reposJson);
+      const activeRepo = repos.find((r: any) => r.id === activeRepoId);
+      if (activeRepo) {
+        token = activeRepo.token;
+        repo = activeRepo.repoName;
+      }
+    } else {
+      // Fall back to old format for backward compatibility
+      token = localStorage.getItem("fs_github_token") || "";
+      repo = localStorage.getItem("fs_repo_name") || "";
+    }
+    
     setValues({
-      githubToken: localStorage.getItem("fs_github_token") || "",
-      repoName: localStorage.getItem("fs_repo_name") || "",
+      githubToken: token,
+      repoName: repo,
     });
   }, []);
 
@@ -273,7 +293,22 @@ export default function Onboarding() {
 
   const handleNext = () => {
     if (isLastStep) {
-      // Save all to localStorage
+      // Save to new localStorage format (multi-repo)
+      const newRepo = {
+        id: Date.now().toString(),
+        token: values.githubToken,
+        repoName: values.repoName,
+        addedAt: Date.now(),
+      };
+      
+      const existingRepos = localStorage.getItem("fs_repos");
+      const repos = existingRepos ? JSON.parse(existingRepos) : [];
+      repos.push(newRepo);
+      
+      localStorage.setItem("fs_repos", JSON.stringify(repos));
+      localStorage.setItem("fs_active_repo_id", newRepo.id);
+      
+      // Keep old format for backward compatibility
       localStorage.setItem("fs_github_token", values.githubToken);
       localStorage.setItem("fs_repo_name", values.repoName);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const STEPS = [
     {
@@ -23,6 +23,13 @@ const STEPS = [
     },
 ];
 
+interface GitHubRepo {
+    id: string;
+    token: string;
+    repoName: string;
+    addedAt: number;
+}
+
 const validateRepo = async (token: string, repo: string) => {
     const [owner, name] = repo.split('/');
     if (!owner || !name) return false;
@@ -38,11 +45,28 @@ const validateRepo = async (token: string, repo: string) => {
 
 export default function SettingsPage() {
     const router = useRouter();
+    const [mode, setMode] = useState<"manage" | "add">("manage"); // manage existing repos or add new one
     const [step, setStep] = useState(0);
     const [values, setValues] = useState({ githubToken: "", repoName: "" });
     const [show, setShow] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+    const [repos, setRepos] = useState<GitHubRepo[]>([]);
+    const [activeRepoId, setActiveRepoId] = useState<string>("");
+    const [loading, setLoading] = useState(true);
+
+    // Load repos from localStorage on mount
+    useEffect(() => {
+        const savedRepos = localStorage.getItem("fs_repos");
+        const savedActiveId = localStorage.getItem("fs_active_repo_id");
+        
+        if (savedRepos) {
+            const parsed = JSON.parse(savedRepos) as GitHubRepo[];
+            setRepos(parsed);
+            setActiveRepoId(savedActiveId || parsed[0]?.id || "");
+        }
+        setLoading(false);
+    }, []);
 
     const current = STEPS[step];
     const value = values[current.key as keyof typeof values];
@@ -62,14 +86,52 @@ export default function SettingsPage() {
 
         if (isLast) {
             setSaving(true);
-            localStorage.setItem("fs_github_token", values.githubToken);
-            localStorage.setItem("fs_repo_name", values.repoName);
+            const newRepo: GitHubRepo = {
+                id: Date.now().toString(),
+                token: values.githubToken,
+                repoName: values.repoName,
+                addedAt: Date.now(),
+            };
+            
+            const updatedRepos = [...repos, newRepo];
+            setRepos(updatedRepos);
+            localStorage.setItem("fs_repos", JSON.stringify(updatedRepos));
+            localStorage.setItem("fs_active_repo_id", newRepo.id);
+            setActiveRepoId(newRepo.id);
+            
             await new Promise((r) => setTimeout(r, 500));
-            router.push("/capture");
+            setMode("manage");
+            setStep(0);
+            setValues({ githubToken: "", repoName: "" });
+            setSaving(false);
         } else {
             setShow(false);
             setStep((s) => s + 1);
         }
+    };
+
+    const handleDeleteRepo = (id: string) => {
+        const updated = repos.filter(r => r.id !== id);
+        setRepos(updated);
+        localStorage.setItem("fs_repos", JSON.stringify(updated));
+        
+        if (activeRepoId === id) {
+            const newActiveId = updated[0]?.id || "";
+            setActiveRepoId(newActiveId);
+            localStorage.setItem("fs_active_repo_id", newActiveId);
+        }
+    };
+
+    const handleSelectRepo = (id: string) => {
+        setActiveRepoId(id);
+        localStorage.setItem("fs_active_repo_id", id);
+    };
+
+    const handleBackFromAdd = () => {
+        setMode("manage");
+        setStep(0);
+        setValues({ githubToken: "", repoName: "" });
+        setError("");
     };
 
     const handleChange = (val: string) => {
@@ -150,97 +212,189 @@ export default function SettingsPage() {
         `}</style>
 
             <main className="fs-root w-full h-screen bg-[#FFFFFF] flex flex-col overflow-hidden">
-
-                {/* Top nav */}
-                <div className="flex items-center justify-between px-8 pt-12">
-                    <button
-                        onClick={() => step === 0 ? router.back() : setStep((s) => s - 1)}
-                        className="back-btn text-xs text-[#777] font-medium tracking-wide"
-                    >
-                        ← back
-                    </button>
-                    <p className="text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
-                        FlowState
-                    </p>
-                    <div style={{ width: 40 }} />
-                </div>
-
-                {/* Progress dots */}
-                <div className="flex items-center justify-center gap-2 mt-6">
-                    {dots}
-                </div>
-
-                {/* Content — vertically centered */}
-                <div className="flex-1 flex flex-col justify-center px-8 pb-4">
-
-                    {/* Step label */}
-                    <p key={`label-${step}`} className="slide-in text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-3">
-                        {current.label}
-                    </p>
-
-                    {/* Question */}
-                    <h1
-                        key={`q-${step}`}
-                        className="slide-in text-[28px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-8 whitespace-pre-line"
-                    >
-                        {current.question.split("\n")[0]}
-                        <br />
-                        <span className="text-[#777]">{current.question.split("\n")[1]}</span>
-                    </h1>
-
-                    {/* Input */}
-                    <div key={`input-${step}`} className="slide-in relative mb-3">
-                        <input
-                            className="fs-input"
-                            type={current.type === "password" && !show ? "password" : "text"}
-                            placeholder={current.placeholder}
-                            value={value}
-                            onChange={(e) => handleChange(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleNext()}
-                            autoFocus
-                        />
-                        {current.type === "password" && (
-                            <button className="eye-toggle" onClick={() => setShow((s) => !s)} tabIndex={-1}>
-                                {show ? "hide" : "show"}
-                            </button>
-                        )}
+                {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                        <p className="text-sm text-gray-500">loading...</p>
                     </div>
+                ) : mode === "manage" ? (
+                    <>
+                        {/* Top nav */}
+                        <div className="flex items-center justify-between px-8 pt-12">
+                            <button
+                                onClick={() => router.back()}
+                                className="back-btn text-xs text-[#777] font-medium tracking-wide"
+                            >
+                                ← back
+                            </button>
+                            <p className="text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
+                                FlowState
+                            </p>
+                            <div style={{ width: 40 }} />
+                        </div>
 
-                    {/* Hint */}
-                    <p key={`hint-${step}`} className="slide-in text-[11px] text-[#333] mb-1">
-                        {current.hint}
-                        {current.link && (
-                            <>
-                                {" · "}
-                                <a
-                                    href={current.link.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-[#666] underline"
-                                >
-                                    {current.link.text}
-                                </a>
-                            </>
-                        )}
-                    </p>
+                        {/* Content */}
+                        <div className="flex-1 flex flex-col justify-center px-8 pb-4 overflow-y-auto">
+                            <p className="text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-3">
+                                repositories
+                            </p>
 
-                    {/* Error */}
-                    {error && (
-                        <p className="text-red-500 text-xs mb-1">{error}</p>
-                    )}
-                </div>
+                            {repos.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <p className="text-[14px] text-[#333] mb-4">no repositories added yet</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3 mb-6">
+                                    {repos.map((repo) => (
+                                        <div
+                                            key={repo.id}
+                                            className="p-4 border border-[#E0E0E0] rounded-lg cursor-pointer transition-all"
+                                            style={{
+                                                backgroundColor: activeRepoId === repo.id ? "#F5F5F5" : "#FFFFFF",
+                                                borderColor: activeRepoId === repo.id ? "#111" : "#E0E0E0",
+                                            }}
+                                            onClick={() => handleSelectRepo(repo.id)}
+                                        >
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <p className="text-[14px] font-semibold text-[#111]">{repo.repoName}</p>
+                                                    <p className="text-[11px] text-[#666] mt-1">
+                                                        Added {new Date(repo.addedAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                                {activeRepoId === repo.id && (
+                                                    <span className="text-[12px] font-semibold text-[#007AFF] ml-2">active</span>
+                                                )}
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteRepo(repo.id);
+                                                }}
+                                                className="mt-3 text-[11px] text-red-500 hover:text-red-700 transition-colors"
+                                            >
+                                                delete
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
-                {/* CTA */}
-                <div className="px-8 pb-12">
-                    <button
-                        className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
-                        onClick={handleNext}
-                        disabled={!value.trim() || saving}
-                    >
-                        {saving ? "saving..." : isLast ? "finish setup →" : "continue →"}
-                    </button>
-                </div>
+                        {/* CTA */}
+                        <div className="px-8 pb-12">
+                            <button
+                                className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
+                                onClick={() => {
+                                    setMode("add");
+                                    setStep(0);
+                                }}
+                            >
+                                + add repository
+                            </button>
+                            <button
+                                className="btn-primary w-full py-3.5 mt-2 bg-[#007AFF] text-white rounded-2xl text-sm font-semibold tracking-wide"
+                                onClick={() => {
+                                    if (activeRepoId) router.push("/capture");
+                                }}
+                                disabled={!activeRepoId}
+                            >
+                                continue →
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* Top nav */}
+                        <div className="flex items-center justify-between px-8 pt-12">
+                            <button
+                                onClick={handleBackFromAdd}
+                                className="back-btn text-xs text-[#777] font-medium tracking-wide"
+                            >
+                                ← back
+                            </button>
+                            <p className="text-[9px] font-semibold tracking-[.28em] text-[#777] uppercase">
+                                FlowState
+                            </p>
+                            <div style={{ width: 40 }} />
+                        </div>
 
+                        {/* Progress dots */}
+                        <div className="flex items-center justify-center gap-2 mt-6">
+                            {dots}
+                        </div>
+
+                        {/* Content — vertically centered */}
+                        <div className="flex-1 flex flex-col justify-center px-8 pb-4">
+
+                            {/* Step label */}
+                            <p key={`label-${step}`} className="slide-in text-[10px] font-semibold tracking-[.2em] text-[#777] uppercase mb-3">
+                                {current.label}
+                            </p>
+
+                            {/* Question */}
+                            <h1
+                                key={`q-${step}`}
+                                className="slide-in text-[28px] font-bold text-[#111] leading-tight tracking-[-0.02em] mb-8 whitespace-pre-line"
+                            >
+                                {current.question.split("\n")[0]}
+                                <br />
+                                <span className="text-[#777]">{current.question.split("\n")[1]}</span>
+                            </h1>
+
+                            {/* Input */}
+                            <div key={`input-${step}`} className="slide-in relative mb-3">
+                                <input
+                                    className="fs-input"
+                                    type={current.type === "password" && !show ? "password" : "text"}
+                                    placeholder={current.placeholder}
+                                    value={value}
+                                    onChange={(e) => handleChange(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                                    autoFocus
+                                />
+                                {current.type === "password" && (
+                                    <button className="eye-toggle" onClick={() => setShow((s) => !s)} tabIndex={-1}>
+                                        {show ? "hide" : "show"}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Hint */}
+                            <p key={`hint-${step}`} className="slide-in text-[11px] text-[#333] mb-1">
+                                {current.hint}
+                                {current.link && (
+                                    <>
+                                        {" · "}
+                                        <a
+                                            href={current.link.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-[#666] underline"
+                                        >
+                                            {current.link.text}
+                                        </a>
+                                    </>
+                                )}
+                            </p>
+
+                            {/* Error */}
+                            {error && (
+                                <p className="text-red-500 text-xs mb-1">{error}</p>
+                            )}
+                        </div>
+
+                        {/* CTA */}
+                        <div className="px-8 pb-12">
+                            <button
+                                className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
+                                onClick={handleNext}
+                                disabled={!value.trim() || saving}
+                            >
+                                {saving ? "saving..." : isLast ? "add this repo →" : "continue →"}
+                            </button>
+                        </div>
+                    </>
+                )}
             </main>
         </>
     );

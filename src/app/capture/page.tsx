@@ -107,8 +107,21 @@ export default function CapturePage() {
     setThinking(true);
 
     try {
-      const githubToken = localStorage.getItem("fs_github_token");
-      const repoName = localStorage.getItem("fs_repo_name");
+      // Get active repo from new multi-repo storage format
+      const reposJson = localStorage.getItem("fs_repos");
+      const activeRepoId = localStorage.getItem("fs_active_repo_id");
+      
+      let githubToken = "";
+      let repoName = "";
+      
+      if (reposJson && activeRepoId) {
+        const repos = JSON.parse(reposJson);
+        const activeRepo = repos.find((r: any) => r.id === activeRepoId);
+        if (activeRepo) {
+          githubToken = activeRepo.token;
+          repoName = activeRepo.repoName;
+        }
+      }
 
       const response = await fetch("/api", {
         method: "POST",

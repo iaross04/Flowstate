@@ -25,21 +25,39 @@ export default function LandingPage() {
   useEffect(() => {
     setIsClient(true);
     
-    // Check for stored credentials
-    const token = localStorage.getItem("fs_github_token");
-    const repo = localStorage.getItem("fs_repo_name");
+    // Check for stored credentials - new multi-repo format
+    const reposJson = localStorage.getItem("fs_repos");
+    const activeRepoId = localStorage.getItem("fs_active_repo_id");
     
-    if (token && repo) {
-      // Validate the stored token
-      setChecking(true);
-      validateToken(token, repo).then((isValid) => {
-        if (isValid) {
-          // Token is valid, go directly to capture
-          router.push("/capture");
-          return;
+    if (reposJson && activeRepoId) {
+      try {
+        const repos = JSON.parse(reposJson);
+        const activeRepo = repos.find((r: any) => r.id === activeRepoId);
+        
+        if (activeRepo) {
+          // Validate the stored token
+          setChecking(true);
+          validateToken(activeRepo.token, activeRepo.repoName).then((isValid) => {
+            if (isValid) {
+              // Token is valid, go directly to capture
+              router.push("/capture");
+              return;
+            }
+            // Token is invalid, show landing page
+            setChecking(false);
+            setShowSplash(true);
+            const fadeTimer = setTimeout(() => setFadeOut(true), 1000);
+            const removeTimer = setTimeout(() => {
+              setShowSplash(false);
+            }, 1500);
+            return () => {
+              clearTimeout(fadeTimer);
+              clearTimeout(removeTimer);
+            };
+          });
         }
-        // Token is invalid, show landing page
-        setChecking(false);
+      } catch {
+        // Error parsing repos, show landing page
         setShowSplash(true);
         const fadeTimer = setTimeout(() => setFadeOut(true), 1000);
         const removeTimer = setTimeout(() => {
@@ -49,7 +67,7 @@ export default function LandingPage() {
           clearTimeout(fadeTimer);
           clearTimeout(removeTimer);
         };
-      });
+      }
     } else {
       // No credentials, show landing page
       setShowSplash(true);
