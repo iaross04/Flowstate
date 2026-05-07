@@ -116,11 +116,11 @@ export default function LandingPage() {
           z-index: 9999;
         }
         .splash-logo {
-          width: min(250px, 80vw);
-          height: min(250px, 80vw);
+          width: 250px;
+          height: 250px;
           object-fit: contain;
-          opacity: 0.85;
-          transition: opacity 0.5s ease-out;
+          opacity: 0.85; /* Lower opacity so it's not super pop */
+          transition: opacity 0.5s ease-out; /* Simple fade out transition */
         }
         .splash-fade-out .splash-logo {
           opacity: 0;
@@ -140,14 +140,14 @@ export default function LandingPage() {
 
       {/* Main Landing Page (Hidden from screen readers while splash is active) */}
       <main
-        className="fs-root w-full min-h-screen bg-[#FFFFFF] flex flex-col overflow-hidden px-4 sm:px-6 lg:px-8"
+        className="fs-root w-full h-screen bg-[#FFFFFF] flex flex-col overflow-hidden"
         aria-hidden={showSplash ? "true" : "false"}
       >
         {/* Top pill */}
-        <div className="flex justify-center pt-8 sm:pt-12">
-          <div className="flex items-center gap-2 bg-[#F9F9F9] border border-[#EBEBEB] rounded-full px-3 sm:px-4 py-1 sm:py-1.5 shadow-sm">
+        <div className="flex justify-center pt-12">
+          <div className="flex items-center gap-2 bg-[#F9F9F9] border border-[#EBEBEB] rounded-full px-4 py-1.5 shadow-sm">
             <span className="blink block w-1.5 h-1.5 rounded-full bg-[#111]" />
-            <span className="text-[9px] sm:text-[10px] font-semibold text-[#333] uppercase tracking-[.2em]">
+            <span className="text-[10px] font-semibold text-[#333] uppercase tracking-[.2em]">
               AI-powered notes
             </span>
           </div>
@@ -158,30 +158,30 @@ export default function LandingPage() {
           <img
             src="/animation/CrashOut.gif"
             alt="FlowState"
-            className="w-40 sm:w-52 lg:w-64 h-40 sm:h-52 lg:h-64 object-contain"
+            className="w-52 h-52 object-contain"
           />
         </div>
 
         {/* Bottom text + CTA */}
-        <div className="px-4 sm:px-8 pb-8 sm:pb-12 flex flex-col items-center gap-4 sm:gap-6">
+        <div className="px-8 pb-12 flex flex-col items-center gap-6">
           {/* Text block */}
           <div className="flex flex-col items-center gap-1 text-center">
-            <p className="text-[8px] sm:text-[9px] font-semibold tracking-[.28em] text-[#333] uppercase mb-1">
+            <p className="text-[9px] font-semibold tracking-[.28em] text-[#333] uppercase mb-1">
               FlowState
             </p>
-            <h1 className="text-[22px] sm:text-[26px] lg:text-[32px] font-bold text-[#111] leading-snug tracking-[-0.02em]">
+            <h1 className="text-[26px] font-bold text-[#111] leading-snug tracking-[-0.02em]">
               think out loud.
             </h1>
-            <h1 className="text-[22px] sm:text-[26px] lg:text-[32px] font-bold text-[#bbb] leading-snug tracking-[-0.02em]">
+            <h1 className="text-[26px] font-bold text-[#bbb] leading-snug tracking-[-0.02em]">
               we'll sort it out.
             </h1>
           </div>
 
           {/* Buttons */}
-          <div className="w-full max-w-sm flex flex-col items-center gap-3">
+          <div className="w-full flex flex-col items-center gap-3">
             <button
               onClick={() => router.push("/onboarding")}
-              className="btn-primary w-full py-3 sm:py-3.5 bg-[#111] text-white rounded-2xl text-sm sm:text-base font-semibold tracking-wide"
+              className="btn-primary w-full py-3.5 bg-[#111] text-white rounded-2xl text-sm font-semibold tracking-wide"
             >
               Get Started
             </button>
