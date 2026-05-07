@@ -16,11 +16,21 @@ Create a `.env.local` file in the root directory:
 
 ```env
 NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key_here
+PYTHON_PATH=python
+WHISPER_MODEL=base
 ```
 
-Get your API key from [Google AI Studio](https://ai.google.dev/)
+Get your Gemini API key from [Google AI Studio](https://ai.google.dev/).
 
-### 3. Run Development Server
+### 3. Install Python dependencies for faster-whisper
+
+```bash
+npm run python:install
+```
+
+This installs the Python requirements used by the local Whisper backend (`faster-whisper`, `ctranslate2`, and `numpy`).
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
