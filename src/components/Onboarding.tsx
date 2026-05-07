@@ -256,7 +256,6 @@ export default function Onboarding() {
   const [values, setValues] = useState({
     githubToken: "",
     repoName: "",
-    openaiKey: "",
   });
   const [isClient, setIsClient] = useState(false);
 
@@ -266,7 +265,6 @@ export default function Onboarding() {
     setValues({
       githubToken: localStorage.getItem("fs_github_token") || "",
       repoName: localStorage.getItem("fs_repo_name") || "",
-      openaiKey: localStorage.getItem("fs_openai_key") || "",
     });
   }, []);
 
@@ -274,30 +272,16 @@ export default function Onboarding() {
   const isLastStep = step === STEPS.length - 1;
 
   const handleNext = () => {
-    // Validation for inputs
-    if (currentStep.type === "multi-input") {
-      const inputsValid = currentStep.inputs?.every((input) => {
-        const val = values[input.id as keyof typeof values];
-        return val && val.trim();
-      });
-      if (!inputsValid) return; // Prevent advancing if any input in step is empty
-    }
-
     if (isLastStep) {
       // Save all to localStorage
       localStorage.setItem("fs_github_token", values.githubToken);
       localStorage.setItem("fs_repo_name", values.repoName);
-      localStorage.setItem("fs_openai_key", values.openaiKey);
 
       // Redirect to settings
       router.push("/settings");
     } else {
       setStep((s) => s + 1);
     }
-  };
-
-  const handleChange = (id: string, val: string) => {
-    setValues((prev) => ({ ...prev, [id]: val }));
   };
 
   if (!isClient) {
@@ -392,28 +376,6 @@ export default function Onboarding() {
               </div>
             )}
           </div>
-
-          {currentStep.type === "multi-input" && (
-            <div key={`input-${step}`} className="slide-in w-full max-w-sm flex flex-col gap-6">
-              {currentStep.inputs?.map((input, idx) => (
-                <input
-                  key={input.id}
-                  className="onboarding-input"
-                  type={input.type}
-                  placeholder={input.placeholder}
-                  value={values[input.id as keyof typeof values] || ""}
-                  onChange={(e) => handleChange(input.id, e.target.value)}
-                  onKeyDown={(e) => {
-                    // Only trigger 'Next' on Enter if it's the last input in the group
-                    if (e.key === "Enter" && idx === currentStep.inputs!.length - 1) {
-                      handleNext();
-                    }
-                  }}
-                  autoFocus={idx === 0} // Autofocus first input
-                />
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Bottom CTA */}

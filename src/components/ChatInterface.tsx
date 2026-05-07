@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import ChatMessage from "./ChatMessage";
-import ResultDisplay from "./ResultDisplay";
 import styles from "./ChatInterface.module.css";
 
 interface Message {

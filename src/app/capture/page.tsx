@@ -3,6 +3,61 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+declare global {
+  interface SpeechRecognition extends EventTarget {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null;
+    onend: ((this: SpeechRecognition, ev: Event) => any) | null;
+    onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any) | null;
+    start(): void;
+    stop(): void;
+  }
+
+  interface SpeechRecognitionEvent extends Event {
+    resultIndex: number;
+    results: SpeechRecognitionResultList;
+  }
+
+  interface SpeechRecognitionResultList {
+    readonly length: number;
+    item(index: number): SpeechRecognitionResult;
+    [index: number]: SpeechRecognitionResult;
+  }
+
+  interface SpeechRecognitionResult {
+    readonly length: number;
+    item(index: number): SpeechRecognitionAlternative;
+    [index: number]: SpeechRecognitionAlternative;
+    readonly isFinal: boolean;
+  }
+
+  interface SpeechRecognitionAlternative {
+    readonly transcript: string;
+    readonly confidence: number;
+  }
+
+  interface SpeechRecognitionErrorEvent extends Event {
+    error: string;
+  }
+
+  var SpeechRecognition: {
+    prototype: SpeechRecognition;
+    new (): SpeechRecognition;
+  };
+
+  var webkitSpeechRecognition: {
+    prototype: SpeechRecognition;
+    new (): SpeechRecognition;
+  };
+
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof webkitSpeechRecognition;
+  }
+}
+
 type Mode = "text" | "mic";
 
 interface LibrarianResult {
@@ -22,8 +77,7 @@ export default function CapturePage() {
   const [resultData, setResultData] = useState<LibrarianResult | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -45,10 +99,13 @@ export default function CapturePage() {
     setThinking(true);
 
     try {
+      const githubToken = localStorage.getItem("fs_github_token");
+      const repoName = localStorage.getItem("fs_repo_name");
+
       const response = await fetch("/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, githubToken, repoName }),
       });
 
       if (!response.ok) {
@@ -74,37 +131,52 @@ export default function CapturePage() {
   };
 
   const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        // const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-        // TODO: send blob to Whisper API, get transcript, set text
-        // For now, simulate:
-        setThinking(true);
-        await new Promise((r) => setTimeout(r, 1500));
-        setText("(transcript will appear here after Whisper integration)");
-        setThinking(false);
-        setMode("text");
-      };
-
-      mediaRecorder.start();
-      setRecording(true);
-    } catch {
-      alert("Mic access denied. Please allow microphone permissions.");
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition not supported in this browser.');
+      return;
     }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      setText(finalTranscript + interimTranscript);
+    };
+
+    recognition.onend = () => {
+      setRecording(false);
+      setMode("text");
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setRecording(false);
+      setText('(speech recognition failed — please try again)');
+      setMode("text");
+    };
+
+    recognition.start();
+    recognitionRef.current = recognition;
+    setRecording(true);
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
     setRecording(false);
   };
 
@@ -309,7 +381,7 @@ export default function CapturePage() {
             <div className="fade-in flex flex-col items-center gap-8">
               <div className="flex flex-col items-center gap-2">
                 <p className="text-[10px] font-semibold tracking-[.2em] text-[#CCC] uppercase">
-                  {recording ? "listening..." : "hold to speak"}
+                  {recording ? "listening..." : "tap to speak"}
                 </p>
                 {recording && (
                   <div className="flex items-center gap-1.5">
@@ -322,9 +394,7 @@ export default function CapturePage() {
               {/* Mic button */}
               <button
                 className={`mic-ring ${recording ? "recording" : ""}`}
-                onPointerDown={startRecording}
-                onPointerUp={stopRecording}
-                onPointerLeave={() => { if (recording) stopRecording(); }}
+                onClick={recording ? stopRecording : startRecording}
               >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="2" width="6" height="11" rx="3" />
@@ -334,8 +404,21 @@ export default function CapturePage() {
                 </svg>
               </button>
 
+              {/* Transcript display */}
+              {text && (
+                <div className="w-full max-w-md">
+                  <textarea
+                    ref={textareaRef}
+                    className="fs-textarea"
+                    value={text}
+                    readOnly
+                    placeholder="your words will appear here..."
+                  />
+                </div>
+              )}
+
               <p className="text-[11px] text-[#CCC] text-center leading-relaxed">
-                release when done —<br />we'll transcribe it for you
+                tap to start —<br />we'll transcribe in real-time
               </p>
             </div>
           )}
