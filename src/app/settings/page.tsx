@@ -6,7 +6,7 @@ import { useState } from "react";
 const STEPS = [
     {
         key: "githubToken",
-        label: "step 1 of 3",
+        label: "step 1 of 2",
         question: "your github\naccess token.",
         hint: "needs repo scope",
         link: { text: "generate one here →", url: "https://github.com/settings/tokens" },
@@ -15,28 +15,34 @@ const STEPS = [
     },
     {
         key: "repoName",
-        label: "step 2 of 3",
-        question: "your obsidian\nvault repo.",
+        label: "step 2 of 2",
+        question: "your github\nrepository.",
         hint: "format: username/repo-name",
         placeholder: "username/my-vault",
         type: "text",
     },
-    {
-        key: "openaiKey",
-        label: "step 3 of 3",
-        question: "your openAI\napi key.",
-        hint: "used for GPT-4o-mini sorting",
-        placeholder: "sk-xxxxxxxxxxxx",
-        type: "password",
-    },
 ];
+
+const validateRepo = async (token: string, repo: string) => {
+    const [owner, name] = repo.split('/');
+    if (!owner || !name) return false;
+    try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${name}`, {
+            headers: { Authorization: `token ${token}` }
+        });
+        return res.ok;
+    } catch {
+        return false;
+    }
+};
 
 export default function SettingsPage() {
     const router = useRouter();
     const [step, setStep] = useState(0);
-    const [values, setValues] = useState({ githubToken: "", repoName: "", openaiKey: "" });
+    const [values, setValues] = useState({ githubToken: "", repoName: "" });
     const [show, setShow] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
 
     const current = STEPS[step];
     const value = values[current.key as keyof typeof values];
@@ -45,11 +51,19 @@ export default function SettingsPage() {
     const handleNext = async () => {
         if (!value.trim()) return;
 
+        if (current.key === "repoName") {
+            const valid = await validateRepo(values.githubToken, value);
+            if (!valid) {
+                setError("Repository not found. Please ensure your repo is public or your token has 'repo' permissions.");
+                return;
+            }
+            setError("");
+        }
+
         if (isLast) {
             setSaving(true);
             localStorage.setItem("fs_github_token", values.githubToken);
             localStorage.setItem("fs_repo_name", values.repoName);
-            localStorage.setItem("fs_openai_key", values.openaiKey);
             await new Promise((r) => setTimeout(r, 500));
             router.push("/capture");
         } else {
@@ -209,6 +223,11 @@ export default function SettingsPage() {
                             </>
                         )}
                     </p>
+
+                    {/* Error */}
+                    {error && (
+                        <p className="text-red-500 text-xs mb-1">{error}</p>
+                    )}
                 </div>
 
                 {/* CTA */}

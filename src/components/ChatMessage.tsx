@@ -22,7 +22,6 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message }: ChatMessageProps) {
-  const isUser = message.type === "user";
 
   return (
     <div className={`${styles.messageWrapper} ${styles[message.type]}`}>

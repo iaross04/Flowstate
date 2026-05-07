@@ -45,10 +45,13 @@ export default function CapturePage() {
     setThinking(true);
 
     try {
+      const githubToken = localStorage.getItem("fs_github_token");
+      const repoName = localStorage.getItem("fs_repo_name");
+
       const response = await fetch("/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, githubToken, repoName }),
       });
 
       if (!response.ok) {
